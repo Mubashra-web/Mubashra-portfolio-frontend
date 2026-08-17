@@ -373,8 +373,8 @@ img { max-width: 100%; display: block; }
 @keyframes scrolldown { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
 
 /* ---------- Section shared ---------- */
-section { position: relative; z-index: 1; padding: 110px 0; }
-.section-head { margin-bottom: 54px; }
+section { position: relative; z-index: 1; padding: 70px 0; }
+.section-head { margin-bottom: 38px; }
 .section-tag {
   font-family: var(--font-mono);
   color: var(--accent);
