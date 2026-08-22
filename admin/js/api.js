@@ -121,4 +121,10 @@ changePassword(currentPassword, newPassword) {
   createExperience(data) { return apiRequest('/api/experience', { method: 'POST', auth: true, body: data }); },
   updateExperience(id, data) { return apiRequest(`/api/experience/${id}`, { method: 'PUT', auth: true, body: data }); },
   deleteExperience(id) { return apiRequest(`/api/experience/${id}`, { method: 'DELETE', auth: true }); },
+
+  // ---------- Courses ----------
+  getCourses() { return apiRequest('/api/courses'); },
+  createCourse(data) { return apiRequest('/api/courses', { method: 'POST', auth: true, body: data }); },
+  updateCourse(id, data) { return apiRequest(`/api/courses/${id}`, { method: 'PUT', auth: true, body: data }); },
+  deleteCourse(id) { return apiRequest(`/api/courses/${id}`, { method: 'DELETE', auth: true }); },
 };

@@ -601,6 +601,33 @@ section { position: relative; z-index: 1; padding: 70px 0; }
 .tl-desc { color: var(--text-dim); font-size: 14px; margin-bottom: 10px; }
 .tl-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* ---------- Courses ---------- */
+.courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; }
+.course-card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 22px 22px 24px;
+  transition: transform .25s ease, border-color .25s ease;
+}
+.course-card:hover { transform: translateY(-6px); border-color: var(--accent); }
+.course-name { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+.course-org { font-family: var(--font-mono); font-size: 12.5px; color: var(--accent); margin-bottom: 10px; }
+.course-desc { color: var(--text-dim); font-size: 14px; margin-bottom: 14px; }
+.course-cert-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-2);
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 30px;
+  transition: border-color .2s ease, color .2s ease;
+}
+.course-cert-link:hover { border-color: var(--accent-2); color: var(--accent-2); }
+
 /* ---------- Contact ---------- */
 .contact-box {
   border: 1px solid var(--border);

@@ -3,7 +3,7 @@
  * ---------------------------------------------------------
  * All admin dashboard UI logic: login, view switching, and
  * CRUD forms for profile / projects / skills / experience /
- * education, backed by admin/js/api.js.
+ * education / courses, backed by admin/js/api.js.
  * ---------------------------------------------------------
  */
 
@@ -163,11 +163,11 @@ function initLogin() {
 
 const VIEW_TITLES = {
   profile: 'Profile', projects: 'Projects', skills: 'Skills',
-  experience: 'Experience', education: 'Education', settings: 'Settings',
+  experience: 'Experience', education: 'Education', courses: 'Courses', settings: 'Settings',
 };
 const VIEW_LOADERS = {
   profile: loadProfile, projects: loadProjects, skills: loadSkills,
-  experience: loadExperience, education: loadEducation,
+  experience: loadExperience, education: loadEducation, courses: loadCourses,
   settings: () => { setVal('apiBaseInput', window.getApiBase()); },
 };
 
@@ -783,6 +783,93 @@ function initEducation() {
 }
 
 /* =========================================================
+   COURSES
+   ========================================================= */
+
+async function loadCourses() {
+  const list = document.getElementById('courseList');
+  if (!list) return;
+  list.innerHTML = '<p class="empty-state">Loading…</p>';
+  try {
+    const res = await Api.getCourses();
+    const items = res.data || [];
+    list.innerHTML = '';
+    if (!items.length) { list.innerHTML = '<p class="empty-state">No courses added yet.</p>'; return; }
+    items.forEach(x => {
+      list.appendChild(itemRow(
+        x.courseName,
+        x.institution,
+        x.certificateUrl ? ['Certificate ✓'] : [],
+        () => fillCourseForm(x),
+        () => deleteCourse(x._id)
+      ));
+    });
+  } catch (err) {
+    list.innerHTML = `<p class="empty-state">${esc(err.message)}</p>`;
+  }
+}
+
+function resetCourseForm() {
+  const form = document.getElementById('courseForm');
+  if (form) form.reset();
+  setVal('courseId', '');
+  setText('courseFormTitle', 'Add Course');
+  setText('courseSubmitBtn', 'Add Course');
+  const cancelBtn = document.getElementById('courseCancelBtn');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  setError('courseError', '');
+}
+
+function fillCourseForm(x) {
+  setVal('courseId', x._id);
+  setVal('courseName', x.courseName || '');
+  setVal('courseInstitution', x.institution || '');
+  setVal('courseDescription', x.description || '');
+  setVal('courseCertificateUrl', x.certificateUrl || '');
+  setVal('courseOrder', x.order || 0);
+  setText('courseFormTitle', 'Edit Course');
+  setText('courseSubmitBtn', 'Update Course');
+  const cancelBtn = document.getElementById('courseCancelBtn');
+  if (cancelBtn) cancelBtn.style.display = 'inline-block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function deleteCourse(id) {
+  if (!confirm('Delete this course?')) return;
+  try {
+    await Api.deleteCourse(id);
+    showToast('Course deleted.');
+    loadCourses();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+function initCourses() {
+  on('courseForm', 'submit', async (e) => {
+    e.preventDefault();
+    setError('courseError', '');
+    const id = getVal('courseId');
+    const data = {
+      courseName: getVal('courseName'),
+      institution: getVal('courseInstitution'),
+      description: getVal('courseDescription'),
+      certificateUrl: getVal('courseCertificateUrl'),
+      order: Number(getVal('courseOrder')) || 0,
+    };
+    try {
+      if (id) { await Api.updateCourse(id, data); showToast('Course updated.'); }
+      else { await Api.createCourse(data); showToast('Course added.'); }
+      resetCourseForm();
+      loadCourses();
+    } catch (err) {
+      setError('courseError', err.message);
+    }
+  });
+  on('courseCancelBtn', 'click', resetCourseForm);
+}
+
+/* =========================================================
    SETTINGS
    ========================================================= */
 
@@ -823,6 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSkills();
   initExperience();
   initEducation();
+  initCourses();
   initSettings();
 
   if (Auth.isLoggedIn()) {

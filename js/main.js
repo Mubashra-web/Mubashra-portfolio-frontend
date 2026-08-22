@@ -57,6 +57,9 @@
     education: [
       { institution: 'University', degree: 'BBA — Business Administration', startDate: '2022', endDate: '2026', grade: '', description: 'Coursework focused on business analytics and data-driven decision making.' },
     ],
+    courses: [
+      { courseName: 'Google Data Analytics', institution: 'Coursera', description: 'Hands-on training in data cleaning, analysis and visualization using spreadsheets, SQL and Tableau.', certificateUrl: '' },
+    ],
   };
 
   const state = {};
@@ -411,6 +414,20 @@
     }).join('');
   }
 
+  // ---------- Render: Courses ----------
+  function renderCourses(items) {
+    const el = document.getElementById('coursesGrid');
+    if (!el) return;
+    if (!items.length) { el.innerHTML = `<p style="color:var(--text-dim)">Nothing added yet.</p>`; return; }
+    el.innerHTML = items.map(it => `
+      <div class="course-card">
+        <h4 class="course-name">${esc(it.courseName)}</h4>
+        <div class="course-org">${esc(it.institution || '')}</div>
+        ${it.description ? `<p class="course-desc">${esc(it.description)}</p>` : ''}
+        ${it.certificateUrl ? `<a class="course-cert-link" href="${esc(it.certificateUrl)}" target="_blank" rel="noopener">View Certificate ↗</a>` : ''}
+      </div>`).join('');
+  }
+
   // ---------- Reveal on scroll ----------
   function initReveal() {
     const items = document.querySelectorAll('.reveal');
@@ -512,12 +529,13 @@
     const skillsPromise = safeGet('/api/skills', FALLBACK.skills);
     const experiencePromise = safeGet('/api/experience', FALLBACK.experience);
     const educationPromise = safeGet('/api/education', FALLBACK.education);
+    const coursesPromise = safeGet('/api/courses', FALLBACK.courses);
 
     const profile = await profilePromise;
     renderProfile(profile);
 
-    const [projects, skills, experience, education] = await Promise.all([
-      projectsPromise, skillsPromise, experiencePromise, educationPromise,
+    const [projects, skills, experience, education, courses] = await Promise.all([
+      projectsPromise, skillsPromise, experiencePromise, educationPromise, coursesPromise,
     ]);
 
     renderStats({ projects, skills, experience });
@@ -526,6 +544,7 @@
     renderProjects(projects);
     renderTimeline('experienceTimeline', [...experience].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)), 'experience');
     renderTimeline('educationTimeline', [...education].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)), 'education');
+    renderCourses([...courses].sort((a, b) => (a.order || 0) - (b.order || 0)));
 
     initReveal();
   }
